@@ -34,31 +34,13 @@
               >
                 <Edit />
               </el-icon>
-              <el-popover
-                placement="top"
-                width="160"
+              <el-icon
+                class="ml-2 group-hover:text-red-500"
+                :class="selectID === dictionary.ID ? 'text-white-800':'text-red-500'"
+                @click="deleteSysDictionaryFunc(dictionary)"
               >
-                <p>确定要删除吗？</p>
-                <div style="text-align: right; margin-top: 8px;">
-                  <el-button
-                    type="primary"
-                    link
-                    @click="dictionary.visible = false"
-                  >取消</el-button>
-                  <el-button
-                    type="primary"
-                    @click="deleteSysDictionaryFunc(dictionary)"
-                  >确定</el-button>
-                </div>
-                <template #reference>
-                  <el-icon
-                    class="ml-2 group-hover:text-red-500"
-                    :class="selectID === dictionary.ID ? 'text-white-800':'text-red-500'"
-                  >
-                    <Delete />
-                  </el-icon>
-                </template>
-              </el-popover>
+                <Delete />
+              </el-icon>
             </div>
           </div>
         </el-scrollbar>
@@ -147,10 +129,10 @@ import {
 } from '@/api/sysDictionary' // 此处请自行替换地址
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 import sysDictionaryDetail from './sysDictionaryDetail.vue'
-import { Edit, Plus } from '@element-plus/icons-vue'
+import { Edit } from '@element-plus/icons-vue'
 
 defineOptions({
   name: 'SysDictionary',
@@ -224,15 +206,20 @@ const closeDialog = () => {
   }
 }
 const deleteSysDictionaryFunc = async(row) => {
-  row.visible = false
-  const res = await deleteSysDictionary({ ID: row.ID })
-  if (res.code === 0) {
-    ElMessage({
-      type: 'success',
-      message: '删除成功',
-    })
-    getTableData()
-  }
+  ElMessageBox.confirm('确定要删除吗?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async() => {
+    const res = await deleteSysDictionary({ ID: row.ID })
+    if (res.code === 0) {
+      ElMessage({
+        type: 'success',
+        message: '删除成功',
+      })
+      getTableData()
+    }
+  })
 }
 
 const dialogForm = ref(null)

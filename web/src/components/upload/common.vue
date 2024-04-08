@@ -3,7 +3,6 @@
     <el-upload
       :action="`${path}/fileUploadAndDownload/upload`"
       :before-upload="checkFile"
-      :headers="{ 'x-token': userStore.token }"
       :on-error="uploadError"
       :on-success="uploadSuccess"
       :show-file-list="false"
@@ -18,7 +17,6 @@
 
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/pinia/modules/user'
 import { isVideoMime, isImageMime } from '@/utils/image'
 
 defineOptions({
@@ -28,7 +26,6 @@ defineOptions({
 const emit = defineEmits(['on-success'])
 const path = ref(import.meta.env.VITE_BASE_API)
 
-const userStore = useUserStore()
 const fullscreenLoading = ref(false)
 
 const checkFile = (file) => {

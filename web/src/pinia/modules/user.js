@@ -5,6 +5,7 @@ import { ElLoading, ElMessage } from 'element-plus'
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { useRouterStore } from './router'
+import cookie from 'js-cookie'
 
 export const useUserStore = defineStore('user', () => {
   const loadingInstance = ref(null)
@@ -18,7 +19,7 @@ export const useUserStore = defineStore('user', () => {
     activeColor: 'var(--el-color-primary)',
     baseColor: '#fff'
   })
-  const token = ref(window.localStorage.getItem('token') || '')
+  const token = ref(window.localStorage.getItem('token') || cookie.get('x-token') || '')
   const setUserInfo = (val) => {
     userInfo.value = val
   }
@@ -30,7 +31,6 @@ export const useUserStore = defineStore('user', () => {
   const NeedInit = () => {
     token.value = ''
     window.localStorage.removeItem('token')
-    localStorage.clear()
     router.push({ name: 'Init', replace: true })
   }
 
@@ -91,9 +91,7 @@ export const useUserStore = defineStore('user', () => {
   const LoginOut = async() => {
     const res = await jsonInBlacklist()
     if (res.code === 0) {
-      token.value = ''
-      sessionStorage.clear()
-      localStorage.clear()
+      await ClearStorage()
       router.push({ name: 'Login', replace: true })
       window.location.reload()
     }
@@ -102,7 +100,8 @@ export const useUserStore = defineStore('user', () => {
   const ClearStorage = async() => {
     token.value = ''
     sessionStorage.clear()
-    localStorage.clear()
+    window.localStorage.removeItem('token')
+    cookie.remove('x-token')
   }
   /* 设置侧边栏模式*/
   const changeSideMode = async(data) => {

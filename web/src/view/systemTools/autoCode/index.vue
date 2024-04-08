@@ -8,13 +8,13 @@
     <div class="gva-search-box">
       <el-collapse
         v-model="activeNames"
-        style="margin-bottom:12px"
+        class="mb-3"
       >
         <el-collapse-item name="1">
           <template #title>
-            <div :style="{fontSize:'16px',paddingLeft:'20px'}">
+            <div class="text-xl pl-4 flex items-center">
               点这里从现有数据库创建代码
-              <el-icon class="header-icon ">
+              <el-icon>
                 <pointer />
               </el-icon>
             </div>
@@ -42,7 +42,6 @@
               <el-select
                 v-model="dbform.businessDB"
                 clearable
-                style="width:194px"
                 placeholder="选择业务库"
                 @change="getDbFunc"
               >
@@ -135,12 +134,20 @@
           />
         </el-form-item>
         <el-form-item
-          label="Struct简称"
           prop="abbreviation"
         >
+          <template #label>
+            <el-tooltip
+              content="简称会作为入参对象名和路由group"
+              placement="bottom"
+              effect="light"
+            >
+              <div> Struct简称 <el-icon><QuestionFilled /></el-icon> </div>
+            </el-tooltip>
+          </template>
           <el-input
             v-model="form.abbreviation"
-            placeholder="简称会作为入参对象名和路由group"
+            placeholder="请输入Struct简称"
           />
         </el-form-item>
         <el-form-item
@@ -153,12 +160,20 @@
           />
         </el-form-item>
         <el-form-item
-          label="文件名称"
           prop="packageName"
         >
+          <template #label>
+            <el-tooltip
+              content="生成文件的默认名称(建议为驼峰格式,首字母小写,如sysXxxXxxx)"
+              placement="bottom"
+              effect="light"
+            >
+              <div> 文件名称 <el-icon><QuestionFilled /></el-icon> </div>
+            </el-tooltip>
+          </template>
           <el-input
             v-model="form.packageName"
-            placeholder="生成文件的默认名称(建议为驼峰格式,首字母小写,如sysXxxXxxx)"
+            placeholder="请输入文件名称"
             @blur="toLowerCaseFunc(form,'packageName')"
           />
         </el-form-item>
@@ -168,7 +183,6 @@
         >
           <el-select
             v-model="form.package"
-            style="width:194px"
           >
             <el-option
               v-for="item in pkgs"
@@ -201,7 +215,6 @@
           </template>
           <el-select
             v-model="form.businessDB"
-            style="width:194px"
             placeholder="选择业务库"
           >
             <el-option
@@ -218,42 +231,71 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
-          <template #label>
-            <el-tooltip
-              content="注：会自动在结构体添加 created_by updated_by deleted_by，方便用户进行资源权限控制"
-              placement="bottom"
-              effect="light"
-            >
-              <div> 创建资源标识 <el-icon><QuestionFilled /></el-icon> </div>
-            </el-tooltip>
-          </template>
-          <el-checkbox v-model="form.autoCreateResource" />
-        </el-form-item>
-        <el-form-item>
-          <template #label>
-            <el-tooltip
-              content="注：把自动生成的API注册进数据库"
-              placement="bottom"
-              effect="light"
-            >
-              <div> 自动创建API </div>
-            </el-tooltip>
-          </template>
-          <el-checkbox v-model="form.autoCreateApiToSql" />
-        </el-form-item>
-        <el-form-item>
-          <template #label>
-            <el-tooltip
-              content="注：自动迁移生成的文件到yaml配置的对应位置"
-              placement="bottom"
-              effect="light"
-            >
-              <div> 自动移动文件 </div>
-            </el-tooltip>
-          </template>
-          <el-checkbox v-model="form.autoMoveFile" />
-        </el-form-item>
+        <div>
+          <el-form-item>
+            <template #label>
+              <el-tooltip
+                content="注：会自动在结构体global.Model其中包含主键和软删除相关操作配置"
+                placement="bottom"
+                effect="light"
+              >
+                <div> 使用GVA结构 <el-icon><QuestionFilled /></el-icon> </div>
+              </el-tooltip>
+            </template>
+            <el-checkbox
+              v-model="form.gvaModel"
+              @change="useGva"
+            />
+          </el-form-item>
+          <el-form-item>
+            <template #label>
+              <el-tooltip
+                content="注：会自动在结构体添加 created_by updated_by deleted_by，方便用户进行资源权限控制"
+                placement="bottom"
+                effect="light"
+              >
+                <div> 创建资源标识 <el-icon><QuestionFilled /></el-icon> </div>
+              </el-tooltip>
+            </template>
+            <el-checkbox v-model="form.autoCreateResource" />
+          </el-form-item>
+          <el-form-item>
+            <template #label>
+              <el-tooltip
+                content="注：把自动生成的API注册进数据库"
+                placement="bottom"
+                effect="light"
+              >
+                <div> 自动创建API <el-icon><QuestionFilled /></el-icon> </div>
+              </el-tooltip>
+            </template>
+            <el-checkbox v-model="form.autoCreateApiToSql" />
+          </el-form-item>
+          <el-form-item>
+            <template #label>
+              <el-tooltip
+                content="注：把自动生成的菜单注册进数据库"
+                placement="bottom"
+                effect="light"
+              >
+                <div> 自动创建菜单 <el-icon><QuestionFilled /></el-icon></div>
+              </el-tooltip>
+            </template>
+            <el-checkbox v-model="form.autoCreateMenuToSql" />
+          </el-form-item>
+          <el-form-item>
+            <template #label>
+              <el-tooltip
+                content="注：自动迁移生成的文件到yaml配置的对应位置"
+                placement="bottom"
+                effect="light"
+              >
+                <div> 自动移动文件 <el-icon><QuestionFilled /></el-icon></div>
+              </el-tooltip>
+            </template>
+            <el-checkbox v-model="form.autoMoveFile" />
+          </el-form-item>
+        </div>
       </el-form>
     </div>
     <!-- 组件列表 -->
@@ -271,6 +313,17 @@
           label="序列"
           width="60"
         />
+
+        <el-table-column
+          align="left"
+          type="index"
+          label="主键"
+          width="60"
+        >
+          <template #default="{row}">
+            <el-checkbox v-model="row.primaryKey" />
+          </template>
+        </el-table-column>
         <el-table-column
           align="left"
           prop="fieldName"
@@ -364,7 +417,7 @@
           width="160"
         >
           <template #default="{row}">
-            <el-input v-model="row.columnName" />
+            <el-input v-model="row.comment" />
           </template>
         </el-table-column>
         <el-table-column
@@ -379,6 +432,7 @@
               style="width:100%"
               placeholder="请选择字段查询条件"
               clearable
+              :disabled="row.fieldType!=='json'"
             >
               <el-option
                 v-for="item in typeSearchOptions"
@@ -422,31 +476,12 @@
               :disabled="(scope.$index + 1) === form.fields.length"
               @click="moveDownField(scope.$index)"
             >下移</el-button>
-            <el-popover
-              v-model="scope.row.visible"
-              placement="top"
-            >
-              <p>确定删除吗？</p>
-              <div style="text-align: right; margin-top: 8px;">
-                <el-button
-                  type="primary"
-                  link
-                  @click="scope.row.visible = false"
-                >取消</el-button>
-                <el-button
-                  type="primary"
-                  @click="deleteField(scope.$index)"
-                >确定</el-button>
-              </div>
-              <template #reference>
-                <el-button
-                  type="primary"
-                  link
-                  icon="delete"
-                  @click="scope.row.visible = true"
-                >删除</el-button>
-              </template>
-            </el-popover>
+            <el-button
+              type="primary"
+              link
+              icon="delete"
+              @click="deleteField(scope.$index)"
+            >删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -463,11 +498,24 @@
       </div>
     </div>
     <!-- 组件弹窗 -->
-    <el-dialog
+    <el-drawer
       v-model="dialogFlag"
-      width="70%"
-      title="组件内容"
+      size="70%"
+      :show-close="false"
     >
+      <template #title>
+        <div class="flex justify-between items-center">
+          <span class="text-lg">组件内容</span>
+          <div>
+            <el-button @click="closeDialog">取 消</el-button>
+            <el-button
+              type="primary"
+              @click="enterDialog"
+            >确 定</el-button>
+          </div>
+        </div>
+      </template>
+
       <FieldDialog
         v-if="dialogFlag"
         ref="fieldDialogNode"
@@ -475,29 +523,28 @@
         :type-options="typeOptions"
         :type-search-options="typeSearchOptions"
       />
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="closeDialog">取 消</el-button>
-          <el-button
-            type="primary"
-            @click="enterDialog"
-          >确 定</el-button>
-        </div>
-      </template>
-    </el-dialog>
 
-    <el-dialog v-model="previewFlag">
-      <template #header>
-        <div class="flex items-center py-1.5">
-          <p>操作栏：</p>
-          <el-button
-            type="primary"
-            @click="selectText"
-          >全选</el-button>
-          <el-button
-            type="primary"
-            @click="copy"
-          >复制</el-button>
+    </el-drawer>
+
+    <el-drawer
+      v-model="previewFlag"
+      size="60%"
+      :show-close="false"
+    >
+
+      <template #title>
+        <div class="flex justify-between items-center">
+          <span class="text-lg">操作栏</span>
+          <div>
+            <el-button
+              type="primary"
+              @click="selectText"
+            >全选</el-button>
+            <el-button
+              type="primary"
+              @click="copy"
+            >复制</el-button>
+          </div>
         </div>
       </template>
       <PreviewCodeDialog
@@ -505,18 +552,7 @@
         ref="previewNode"
         :preview-code="preViewCode"
       />
-      <template #footer>
-        <div
-          class="dialog-footer"
-          style="padding-top:14px;padding-right:14px"
-        >
-          <el-button
-            type="primary"
-            @click="previewFlag = false"
-          >确 定</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    </el-drawer>
   </div>
 </template>
 
@@ -527,14 +563,17 @@ import PreviewCodeDialog from '@/view/systemTools/autoCode/component/previewCode
 import { toUpperCase, toHump, toSQLLine, toLowerCase } from '@/utils/stringFun'
 import { createTemp, getDB, getTable, getColumn, preview, getMeta, getPackageApi } from '@/api/autoCode'
 import { getDict } from '@/utils/dictionary'
-import { ref, getCurrentInstance, reactive, watch, toRaw } from 'vue'
+import { ref, reactive, watch, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 
 defineOptions({
   name: 'AutoCode'
 })
+const gormModelList = ['id', 'created_at', 'updated_at', 'deleted_at']
+
+const dataModelList = ['created_by', 'updated_by', 'deleted_by']
 
 const typeOptions = ref([
   {
@@ -580,6 +619,10 @@ const typeOptions = ref([
   {
     label: '文件（json字符串）',
     value: 'file',
+  },
+  {
+    label: 'JSON',
+    value: 'json',
   }
 ])
 
@@ -626,6 +669,7 @@ const fieldTemplate = {
   require: false,
   sort: false,
   errorText: '',
+  primaryKey: false,
   clearable: true,
   fieldSearchType: '',
   dictType: ''
@@ -651,7 +695,9 @@ const form = ref({
   description: '',
   businessDB: '',
   autoCreateApiToSql: true,
+  autoCreateMenuToSql: true,
   autoMoveFile: true,
+  gvaModel: true,
   autoCreateResource: false,
   fields: []
 })
@@ -680,6 +726,26 @@ const dialogMiddle = ref({})
 const bk = ref({})
 const dialogFlag = ref(false)
 const previewFlag = ref(false)
+
+const useGva = (e) => {
+  if (e && form.value.fields.length) {
+    ElMessageBox.confirm(
+      '如果您开启GVA默认结构，会自动添加ID,CreatedAt,UpdatedAt,DeletedAt字段，此行为将自动清除您目前在下方创建的重名字段，是否继续？',
+      '注意',
+      {
+        confirmButtonText: '继续',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+      .then(() => {
+        form.value.fields = form.value.fields.filter(item => !gormModelList.some(gormfd => gormfd === item.columnName))
+      })
+      .catch(() => {
+        form.value.gvaModel = false
+      })
+  }
+}
 
 const toLowerCaseFunc = (form, key) => {
   form[key] = toLowerCase(form[key])
@@ -720,9 +786,9 @@ const moveDownField = (index) => {
   form.value.fields.splice(index, 0, oldDownField)
 }
 
-const currentInstance = getCurrentInstance()
+const fieldDialogNode = ref(null)
 const enterDialog = () => {
-  currentInstance.refs.fieldDialogNode.fieldDialogFrom.validate(valid => {
+  fieldDialogNode.value.fieldDialogFrom.validate(valid => {
     if (valid) {
       dialogMiddle.value.fieldName = toUpperCase(
         dialogMiddle.value.fieldName
@@ -743,7 +809,13 @@ const closeDialog = () => {
   dialogFlag.value = false
 }
 const deleteField = (index) => {
-  form.value.fields.splice(index, 1)
+  ElMessageBox.confirm('确定要删除吗?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async() => {
+    form.value.fields.splice(index, 1)
+  })
 }
 const autoCodeForm = ref(null)
 const enterForm = async(isPreview) => {
@@ -754,6 +826,15 @@ const enterForm = async(isPreview) => {
     })
     return false
   }
+
+  if (!form.value.gvaModel && form.value.fields.every(item => !item.primaryKey)) {
+    ElMessage({
+      type: 'error',
+      message: '您至少需要创建一个主键才能保证自动化代码的可行性'
+    })
+    return false
+  }
+
   if (
     form.value.fields.some(item => item.fieldName === form.value.structName)
   ) {
@@ -800,19 +881,18 @@ const enterForm = async(isPreview) => {
         const data = await createTemp(form.value)
         if (data.headers?.success === 'false') {
           return
-        } else {
-          if (form.value.autoMoveFile) {
-            ElMessage({
-              type: 'success',
-              message: '自动化代码创建成功，自动移动成功'
-            })
-            return
-          }
+        }
+        if (form.value.autoMoveFile) {
           ElMessage({
             type: 'success',
-            message: '自动化代码创建成功，正在下载'
+            message: '自动化代码创建成功，自动移动成功'
           })
+          return
         }
+        ElMessage({
+          type: 'success',
+          message: '自动化代码创建成功，正在下载'
+        })
         const blob = new Blob([data])
         const fileName = 'ginvueadmin.zip'
         if ('download' in document.createElement('a')) {
@@ -858,7 +938,6 @@ const getTableFunc = async() => {
 }
 
 const getColumnFunc = async() => {
-  const gormModelList = ['id', 'created_at', 'updated_at', 'deleted_at']
   const res = await getColumn(dbform.value)
   if (res.code === 0) {
     let dbtype = ''
@@ -878,7 +957,7 @@ const getColumnFunc = async() => {
     form.value.fields = []
     res.data.columns &&
           res.data.columns.forEach(item => {
-            if (!gormModelList.some(gormfd => gormfd === item.columnName)) {
+            if (needAppend(item)) {
               const fbHump = toHump(item.columnName)
               form.value.fields.push({
                 fieldName: toUpperCase(fbHump),
@@ -886,6 +965,7 @@ const getColumnFunc = async() => {
                 fieldType: fdMap.value[item.dataType],
                 dataType: item.dataType,
                 fieldJson: fbHump,
+                primaryKey: item.primaryKey,
                 dataTypeLong: item.dataTypeLong && item.dataTypeLong.split(',')[0],
                 columnName: dbtype === 'oracle' ? item.columnName.toUpperCase() : item.columnName,
                 comment: item.columnComment,
@@ -899,6 +979,18 @@ const getColumnFunc = async() => {
           })
   }
 }
+
+const needAppend = (item) => {
+  let isAppend = true
+  if (form.value.gvaModel && gormModelList.some(gormfd => gormfd === item.columnName)) {
+    isAppend = false
+  }
+  if (form.value.autoCreateResource && dataModelList.some(datafd => datafd === item.columnName)) {
+    isAppend = false
+  }
+  return isAppend
+}
+
 const setFdMap = async() => {
   const fdTypes = ['string', 'int', 'bool', 'float64', 'time.Time']
   fdTypes.forEach(async fdtype => {
